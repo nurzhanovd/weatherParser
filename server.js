@@ -4,57 +4,28 @@ const rp = require('request-promise')
 const request = require('request')
 const cheerio = require('cheerio')
 
-const config = {
-  googleApiKey: 'AIzaSyC3iWzi2JUstwfZXTjqkNMiURQ74RpTizE',
-}
-
-
 const app = express()
 
 app.use(bodyParser.json())
 
-const geocode = (req, res, next) => {
-  const encoded = encodeURIComponent(req.params.city)
 
-  const uri = `https://maps.googleapis.com/maps/api/geocode/json?key=${config.googleApiKey}&address=${encoded}`
+app.get('/weather/:city', (req, res) => {
+  const city = req.params.city;
 
-  rp({
-    uri,
-    json: true
-  })
-    .then(res => {
-      if (res.status === 'OK') {
+  let lat;
+  let lng;
 
-        req.middlewareData = {
-          lat: res.results[0].geometry.location.lat,
-          long: res.results[0].geometry.location.lng
-        }
+  if(city.toLowerCase() === 'astana'){
+    lat = '51.16052269999999'
+    lng = '71.47035579999999'
+  }else if(city.toLowerCase() === 'almaty'){
+    lat = '43.2220146'
+    lng = '76.8512485'
+  }
 
-        next()
-
-      } else {
-        res.status(401).json({
-          message: 'wrong input'
-        }).end()
-      }
-    })
-    .catch(e => {
-      console.log(e)
-      res.status(500).json({
-        message: 'Geolocation middleware function error' + e
-      })
-    })
-}
-
-
-app.get('/weather/:city', geocode, (req, res) => {
-  const lat = req.middlewareData.lat
-  const long = req.middlewareData.long
-
-  const url = `https://yandex.kz/pogoda/?lat=${lat}&lon=${long}`;
+  const url = `https://yandex.kz/pogoda/?lat=${lat}&lon=${lng}`;
 
   request(url, function (error, response, html) {
-
 
     if (!error) {
       const $ = cheerio.load(html);
@@ -83,10 +54,7 @@ app.get('/weather/:city', geocode, (req, res) => {
       })
 
     }
-
-
   })
-
 
 })
 

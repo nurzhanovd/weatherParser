@@ -1,6 +1,5 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const rp = require('request-promise')
 const request = require('request')
 const cheerio = require('cheerio')
 
@@ -59,7 +58,6 @@ app.get('/weather/:city', (req, res) => {
 })
 
 app.listen(8081, () => console.log('success connection'))
-
 
 
 

@@ -38,7 +38,12 @@ const geocode = (req, res, next) => {
         }).end()
       }
     })
-    .catch(e => console.log(e))
+    .catch(e => {
+      console.log(e)
+      res.status(500).json({
+        message: 'Geolocation middleware function error' + e
+      })
+    })
 }
 
 
@@ -49,11 +54,12 @@ app.get('/weather/:city', geocode, (req, res) => {
   const url = `https://yandex.kz/pogoda/?lat=${lat}&lon=${long}`;
 
   request(url, function (error, response, html) {
+
+
     if (!error) {
-      var $ = cheerio.load(html);
+      const $ = cheerio.load(html);
 
-
-      var json = {
+      const json = {
         temp: "",
         desc: ""
       };
@@ -68,33 +74,25 @@ app.get('/weather/:city', geocode, (req, res) => {
 
       json.desc = $('.fact__condition').text()
 
-      console.log(json)
+      if (json.temp && json.desc) res.status(200).json(json)
+
+
+    } else {
+      res.status(500).json({
+        message: 'error' + error
+      })
+
     }
 
+
   })
+
 
 })
 
-  app.listen(8081, () => console.log('success connection'))
+app.listen(8081, () => console.log('success connection'))
 
 
-/*
-  const uri = `https://api.weather.yandex.ru/v1/forecast?lat=${lat}&lon=${long}&hours=false`;
 
-  console.log(uri)
-
-  request({
-    uri,
-    headers: {
-      'X-Yandex-API-Key': config["X-Yandex-API-Key"]
-    }
-  })
-    .then(res => {
-      console.log(20, res)
-    })
-    .catch(e => console.log(e))
-
-
- */
 
 

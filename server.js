@@ -45,6 +45,9 @@ app.get('/weather/:city', (req, res) => {
       json.desc = $('.fact__condition').text()
 
       if (json.temp && json.desc) res.status(200).json(json)
+      else res.status(500).json({
+        message: 'city is not found'
+      })
 
 
     } else {
@@ -58,6 +61,7 @@ app.get('/weather/:city', (req, res) => {
 })
 
 app.listen(8081, () => console.log('success connection'))
+
 
 
 
